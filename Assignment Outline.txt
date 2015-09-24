@@ -2,14 +2,19 @@
 Cloud Computing - HW01 Outline
 
 Client#01		Sends a request to the server to check if a number is prime or not.
-		After a certain time, send the request again. Continue sending requests until 			client is terminated.
+		After a certain time, send the request again. Continue sending requests until 
+		client is terminated.
 
 Client#02		Start an initial virtual machine to handle requests sent to the server.
-		Invokes look busy on the initial virtual machine so that it seems overloaded and 			response time is diminished.
-		Check response times; if response time is higher than a certain threshold, allocate 		another virtual machine to handle the requests; do this as needed.
+		Invokes look busy on the initial virtual machine so that it seems overloaded and 
+		response time is diminished.
+		Check response times; if response time is higher than a certain threshold, allocate
+		another virtual machine to handle the requests; do this as needed.
 		Allocate tasks to the vm(s) using (a) a round robin method or (b) priority.
 		After a certain time period, remove look busy from the initial virtual machine.
 
-Web Server	Grabs requests from Client#01 and sends them to the virtual machine(s) allocated. 			Passes results back from the vm(s) to client.
+Web Server	Grabs requests from Client#01 and sends them to the virtual machine(s) allocated. 
+		Passes results back from the vm(s) to client.
 
-Virtual Machine(s)	Receive request from the server to perform a prime check, and send the results back to 		the server to be passed along to the client.
+Virtual Machine(s)	Receive request from the server to perform a prime check, and send the results back to 
+			the server to be passed along to the client.
