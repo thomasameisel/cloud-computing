@@ -8,7 +8,6 @@ import time
 #Code takes in a number and checks to see if that number is prime.
 
 #Input here needs to be grabbed from the browser...
-num = input('Enter a number: ')
 
 def is_prime(num):
     
@@ -21,26 +20,23 @@ def is_prime(num):
     if  num <= 1:
         #print('This is NOT a prime number.')
         a = False;
-    #elif num <= 3:
-        #print('This is a prime number.')
     elif num % 2 == 0 or num % 3 == 0:
         #print('This is NOT a prime number.')
         b = False;
-    i = 5
-    while i*i <= num:
-        if num % i == 0 or num % (i + 2) == 0:
-            #print('This is NOT a prime number.')
-            c = False;
-        i = i + 6
-
-    if a != False and b != False and c != False:
-        print('This is a prime number.')
-        t2 = time.clock()
-        print('Processing time: ', t2-t1)
     else:
-        print('This is not a prime number.')
-        t2 = time.clock()
-        print('Processing time:', t2-t1)
+        i = 5
+    	while i*i <= num:
+            if num % i == 0 or num % (i + 2) == 0:
+                #print('This is NOT a prime number.')
+                c = False;
+            i = i + 6
+    
+    t2 = time.clock()
+    processing_time = t2-t1 
+    
+    if a != False and b != False and c != False:
+        return (True, processing_time) 
+    else:
+        return (False, processing_time)
 
 #Function call
-is_prime(num)
