@@ -15,10 +15,13 @@ class MyHTTPHandler (BaseHTTPServer.BaseHTTPRequestHandler):
         global num 
         """ Respond to a GET request. """
         print "GET request received; reading the request"
+        #do is_prime from the vm 
         is_prime, processing_time = prime.is_prime(int(self.path[1:]))
         num += 1
         total_time += processing_time 
         average_time = total_time/num 
+        #if average_time is greater than certain amount, spawn new vm
+        #if average_time is less than certain amount, terminate vm 
         print "Received request = ", self 
         self.send_response (200)
         self.send_header ("Content-type", "text/html")
