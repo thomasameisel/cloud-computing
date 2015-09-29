@@ -73,4 +73,7 @@ def create_vm():
         raise
 
 #Function that terminates a machine
-def terminate_vm():
+def terminate_vm(server_name):
+
+    server = server_name
+    server.delete()
