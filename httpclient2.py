@@ -4,14 +4,14 @@
 #Created for CS5287: Cloud Computing
 #Institution: Vanderbilt University
 
-#Starts virtual machine to handle requests sent to server. Additionally, invokes look busy on the
-#virtual machine to simulate busy load. As response times slow, allocates a new virtual machine
-#to handle incoming tasks via a (a) round robin or (b) priority method.
+#Starts virtual machine to handle requests sent to server. Also terminates a
+#virtual machine that is not needed to handle requests.
 
 import os
 import sys
 import httplib
 import time
+import random
 from novaclient.v2 import client
 
 def get_nova_creds():
@@ -22,10 +22,15 @@ def get_nova_creds():
     d['auth_url'] = os.environ['OS_TENANT_NAME']
     return d
 
-def main():
+#Function that creates a virtual machine
+def create_vm():
     #Retrieve credentials for version 2 of novaclient
     creds = get_nova_creds()
 
+    #Assign the server a name
+    random = str(random.randint(1,20))
+    server_name = 'vm_' + random
+    
     #Access the connection from which everything else is obtained
     try:
         nova = client.Client(**creds)
@@ -39,7 +44,7 @@ def main():
     sgref = nova.security_groups.find(name="default")
 
     attrs = {
-        'name' : 'test_vm',
+        'name' : server_name,
         'image': imageref,
         'flavor' : flavorref,
         'key_name' : 'buck',
@@ -56,7 +61,7 @@ def main():
     while(server.status != 'ACTIVE'):
         print "Not active yet; sleep for a while."
         time.sleep(2)
-        server = nova.servers.find(name='test_vm')
+        server = nova.servers.find(name=server_name)
 
     #Add a floating IP
     try:
@@ -67,6 +72,5 @@ def main():
         server.delete()
         raise
 
-#Invoke Main:
-if __name__ == "__main__":
-    main()
+#Function that terminates a machine
+def terminate_vm():

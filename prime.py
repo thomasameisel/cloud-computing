@@ -39,4 +39,3 @@ def is_prime(num):
     else:
         return (False, processing_time)
 
-#Function call

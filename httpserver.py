@@ -1,7 +1,13 @@
-# !/bin/python
+
+#Authors: Thomas Meisel and Lauren Buck
+#Date Created: September 27,2015
+#Created for CS5287: Cloud Computing
+#Institution Vanderbilt University
+
 import time
 import BaseHTTPServer
 import prime
+import httpclient2
 
 HOST = ''
 PORT = 8080
@@ -21,7 +27,12 @@ class MyHTTPHandler (BaseHTTPServer.BaseHTTPRequestHandler):
         total_time += processing_time 
         average_time = total_time/num 
         #if average_time is greater than certain amount, spawn new vm
-        #if average_time is less than certain amount, terminate vm 
+        if average_time > 20 :
+            httpclient2.create_vm()
+        #if average_time is less than certain amount, terminate vm
+        if average_time < 20 :
+            httpclient2.terminate_vm()
+        #terminate function in httpclient2.py still to be completed
         print "Received request = ", self 
         self.send_response (200)
         self.send_header ("Content-type", "text/html")
