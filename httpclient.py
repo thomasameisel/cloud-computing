@@ -2,52 +2,17 @@
 #
 # sample http client
 #
-import sys
-import httplib
+import requests
 import time
 
 def main ():
-    print "Instantiating a connection obj"
-    try:
-        conn = httplib.HTTPConnection ("localhost", "8080")
-    except:
-        print "Exception thrown: ", sys.exc_info()[0]
-        raise
-
-    print "sending a GET request to our http server"
-    try:
-        conn.request ("GET", "/123422342323423")
-    except:
-        print "Exception thrown: ", sys.exc_info()[0]
-        raise
-
-    print "retrieving a response from http server"
-    try:
-        resp = conn.getresponse ()
-    except:
-        print "Exception thrown: ", sys.exc_info()[0]
-        raise
-
-    print "printing response headers"
-    try:
-        for hdr in resp.getheaders ():
-            print hdr
-    except:
-        print "Exception thrown: ", sys.exc_info()[0]
-        raise
-
-    print "printing data"
-    try:
-        data = resp.read ()
-        print "Length of data = ", len(data)
-        print data
-    except:
-        print "Exception thrown: ", sys.exc_info()[0]
-        raise
+    params = {'num':'123422342323423'}
+    r = requests.get("http://localhost:8080", params)
+    print r.json()
 
 # invoke main
 if __name__ == "__main__":
     while True: 
         main ()
-        time.sleep(1)
+        time.sleep(2)
     
