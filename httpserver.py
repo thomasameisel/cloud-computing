@@ -3,21 +3,22 @@
 #Date Created: September 27,2015
 #Created for CS5287: Cloud Computing
 #Institution Vanderbilt University
-import json
 
-import time
+import json
 import BaseHTTPServer
-import prime
 import nova_server_create
-import httplib
 import requests
 import urlparse
+import primeserver
+import thread
 
 HOST = ''
 PORT = 8080
 total_time = 0
 num_requests = 0
 vm_array = []
+vm_cur_port = 8000
+vm_cur_index = 0
 
 # MyHTTPHandler inherits from BaseHTTPServer.BaseHTTPRequestHandler
 class MyHTTPHandler (BaseHTTPServer.BaseHTTPRequestHandler):
@@ -31,8 +32,10 @@ class MyHTTPHandler (BaseHTTPServer.BaseHTTPRequestHandler):
         parsed = urlparse.urlparse(self.path)
         prime_num = (urlparse.parse_qs(parsed.query)['num'])[0]
 
-        params = {'num':prime_num }
-        r = requests.get("http://localhost:8000",params)
+        #later this will be the server to use, now it is just the next port to use for the local server
+        next_vm = choose_vm(vm_array)
+        params = {'num':prime_num,'response_num':num_requests+1}
+        r = requests.get("http://localhost:%s"%next_vm,params)
         data = r.json()
         is_prime = data["is_prime"]
         processing_time = data["processing_time"]
@@ -48,28 +51,41 @@ class MyHTTPHandler (BaseHTTPServer.BaseHTTPRequestHandler):
             remove_vm(vm_array)
 
         response = {"number":prime_num, "is_prime":is_prime, "processing_time":processing_time,
-                    "num_requests":num_requests, "average_processing_time":average_time}
+                    "num_requests":num_requests, "average_processing_time":average_time, "port":next_vm}
 
         self.send_response (200)
         self.send_header ("Content-type", "application/json")
         self.end_headers ()
         self.wfile.write (json.dumps(response))
 
+#later this will create a new server
+#since creating new servers is not working, it creates a new server locally on a new port
 def add_vm (vms):
     #comment out the next two lines when debugging
     #server = nova_server_create.create_vm()
     #vms.append(server)
-    #uncomment the next line when not debugging
-    vms.append("VM0")
+    #uncomment the next lines when not debugging
+    global vm_cur_port
+    thread.start_new_thread(primeserver.create_instance, ("",vm_cur_port))
+    vms.append(vm_cur_port)
+    vm_cur_port += 1
     print "VM created"
     print "Number of VMs: %s" % len(vms)
 
+#later this will terminate a server
 def remove_vm (vms):
     #comment out the next line when debugging
     #nova_server_create.terminate_vm(vms.index(0))
     vms.pop(0)
     print "VM terminated"
     print "Number of VMs: %s" % len(vms)
+
+#later this will choose the create vm
+#since creating new vms is not working, it returns the port of the next vm
+def choose_vm (vms):
+    global vm_cur_index
+    vm_cur_index = (vm_cur_index+1) % len(vms)
+    return vms[vm_cur_index]
 
 if __name__ == '__main__':
     print "Instantiating a BaseHTTPServer"

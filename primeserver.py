@@ -4,7 +4,6 @@
 #Created for CS5287: Cloud Computing
 #Institution Vanderbilt University
 
-import time
 import BaseHTTPServer
 import prime
 import urlparse
@@ -19,11 +18,11 @@ vm_array = []
 # MyHTTPHandler inherits from BaseHTTPServer.BaseHTTPRequestHandler
 class MyHTTPHandler (BaseHTTPServer.BaseHTTPRequestHandler):
     def do_GET (self):
+        global PORT
         """ Respond to a GET request. """
         print "GET request received; reading the request"
         parsed = urlparse.urlparse(self.path)
         prime_num = (urlparse.parse_qs(parsed.query)['num'])[0]
-        print "Checking if %s is prime" % prime_num
         is_prime, processing_time = prime.is_prime(int(prime_num))
         response = {"is_prime":is_prime, "processing_time":processing_time}
         self.send_response (200)
@@ -31,12 +30,15 @@ class MyHTTPHandler (BaseHTTPServer.BaseHTTPRequestHandler):
         self.end_headers ()
         self.wfile.write(json.dumps(response))
 
-if __name__ == '__main__':
-    print "Instantiating a Prime BaseHTTPServer"
+#if __name__ == '__main__':
+def create_instance (name,port):
+    global PORT
+    PORT = port
+    #print "Instantiating a Prime BaseHTTPServer"
     server_class = BaseHTTPServer.HTTPServer
     httpd = server_class ((HOST, PORT), MyHTTPHandler)
     try:
-        print "Run a Prime BaseHTTPServer"
+        #print "Run a Prime BaseHTTPServer"
         httpd.serve_forever ()
     except KeyboardInterrupt:
         pass
