@@ -16,7 +16,7 @@ def main ():
 
     print "sending a GET request to our http server"
     try:
-        conn.request ("GET", "/1234245658749")
+        conn.request ("GET", "/123422342323423")
     except:
         print "Exception thrown: ", sys.exc_info()[0]
         raise
