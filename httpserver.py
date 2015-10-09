@@ -15,7 +15,9 @@ import thread
 HOST = ''
 PORT = 8080
 total_time = 0
+machine_use = 0
 num_requests = 0
+round_robin = True
 vm_array = []
 vm_cur_port = 8000
 vm_cur_index = 0
@@ -83,8 +85,19 @@ def remove_vm (vms):
 #later this will choose the create vm
 #since creating new vms is not working, it returns the port of the next vm
 def choose_vm (vms):
+    global round_robin
     global vm_cur_index
-    vm_cur_index = (vm_cur_index+1) % len(vms)
+    global machine_use
+    global total_time
+    if round_robin == True and machine_use == 0:
+        vm_cur_index = (vm_cur_index+1) % len(vms)
+        machine_use = 1;
+    elif round_robin == True and machine_use == 1:
+        vm_cur_index = (vm_cur_index-1) % len(vms)
+        machine_use = 0;
+    elif round_robin == False and total_time > 1:
+        vm_cur_index = (vm_cur_index-1) % len(vms)
+
     return vms[vm_cur_index]
 
 if __name__ == '__main__':
