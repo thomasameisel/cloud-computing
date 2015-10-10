@@ -11,6 +11,7 @@ import requests
 import urlparse
 import primeserver
 import thread
+from commands import *
 
 HOST = ''
 PORT = 8080
@@ -35,7 +36,7 @@ class MyHTTPHandler (BaseHTTPServer.BaseHTTPRequestHandler):
         #later this will be the server to use, now it is just the next port to use for the local server
         next_vm = choose_vm(vm_array)
         params = {'num':prime_num,'response_num':num_requests+1}
-        r = requests.get("http://%s:8000"%next_vm.ips[0],params)
+        r = requests.get("http://%s:8000"%next_vm['addresses']['internal network'][0]['addr'],params)
         data = r.json()
         is_prime = data["is_prime"]
         processing_time = data["processing_time"]
@@ -63,6 +64,8 @@ class MyHTTPHandler (BaseHTTPServer.BaseHTTPRequestHandler):
 def add_vm (vms):
     #comment out the next two lines when debugging
     server = nova_server_create.create_vm()
+    #not sure how to get the fixed ip of the server
+    getstatusoutput("ssh -i key_pair2.pem ubuntu@%s 'sudo apt-get install git -y && git clone https://github.com/thomasameisel/cloud-computing && cd cloud-computing && python' < primeserver.py"%server['addresses']['internal network'][0]['addr'])
     vms.append(server)
     #uncomment the next lines when not debugging
     #global vm_cur_port
