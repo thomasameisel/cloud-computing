@@ -3,7 +3,7 @@ import os
 import sys
 import time
 from random import randint
-from novaclient.v2 import client
+from novaclient import client
 
 # Institution: Vanderbilt University
 # Code created for the CS4287-5287 course
@@ -28,7 +28,7 @@ def get_nova_creds ():
 
 #Function that creates a virtual machine
 def create_vm ():
-    
+
     # get our credentials for version 2 of novaclient
     creds = get_nova_creds()
 
@@ -53,14 +53,14 @@ def create_vm ():
     sgref = nova.security_groups.find (name="default")
     # for some reason, this is not working.
     #netref = nova.networks.find (name="internal network")
-    
+
     attrs = {
         'name' : server_name,
         'image' : imageref,
         'flavor' : flavorref,
         # providing the ref this way for security group is not working
         #'security_groups' : sgref,
-        'key_name' : 'key_pair',
+        'key_name' : 'key_pair2',
         # I was going to do the following but does not work
         # 'nics' : [{'net-id' : netref.id}]
         'nics' : [{'net-id' : 'b16b0244-e1b5-4d36-90ff-83a0d87d8682'}]

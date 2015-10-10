@@ -15,11 +15,9 @@ import thread
 HOST = ''
 PORT = 8080
 total_time = 0
-machine_use = 0
 num_requests = 0
 round_robin = True
 vm_array = []
-vm_cur_port = 8000
 vm_cur_index = 0
 
 # MyHTTPHandler inherits from BaseHTTPServer.BaseHTTPRequestHandler
@@ -37,7 +35,7 @@ class MyHTTPHandler (BaseHTTPServer.BaseHTTPRequestHandler):
         #later this will be the server to use, now it is just the next port to use for the local server
         next_vm = choose_vm(vm_array)
         params = {'num':prime_num,'response_num':num_requests+1}
-        r = requests.get("http://localhost:%s"%next_vm,params)
+        r = requests.get("http://%s:8000"%next_vm.ips[0],params)
         data = r.json()
         is_prime = data["is_prime"]
         processing_time = data["processing_time"]
@@ -53,7 +51,7 @@ class MyHTTPHandler (BaseHTTPServer.BaseHTTPRequestHandler):
             remove_vm(vm_array)
 
         response = {"number":prime_num, "is_prime":is_prime, "processing_time":processing_time,
-                    "num_requests":num_requests, "average_processing_time":average_time, "port":next_vm}
+                    "num_requests":num_requests, "average_processing_time":average_time}
 
         self.send_response (200)
         self.send_header ("Content-type", "application/json")
@@ -64,20 +62,20 @@ class MyHTTPHandler (BaseHTTPServer.BaseHTTPRequestHandler):
 #since creating new servers is not working, it creates a new server locally on a new port
 def add_vm (vms):
     #comment out the next two lines when debugging
-    #server = nova_server_create.create_vm()
-    #vms.append(server)
+    server = nova_server_create.create_vm()
+    vms.append(server)
     #uncomment the next lines when not debugging
-    global vm_cur_port
-    thread.start_new_thread(primeserver.create_instance, ("",vm_cur_port))
-    vms.append(vm_cur_port)
-    vm_cur_port += 1
+    #global vm_cur_port
+    #thread.start_new_thread(primeserver.create_instance, ("",vm_cur_port))
+    #vms.append(vm_cur_port)
+    #vm_cur_port += 1
     print "VM created"
     print "Number of VMs: %s" % len(vms)
 
 #later this will terminate a server
 def remove_vm (vms):
     #comment out the next line when debugging
-    #nova_server_create.terminate_vm(vms.index(0))
+    nova_server_create.terminate_vm(vms.index(0))
     vms.pop(0)
     print "VM terminated"
     print "Number of VMs: %s" % len(vms)
@@ -87,16 +85,8 @@ def remove_vm (vms):
 def choose_vm (vms):
     global round_robin
     global vm_cur_index
-    global machine_use
-    global total_time
-    if round_robin == True and machine_use == 0:
+    if round_robin:
         vm_cur_index = (vm_cur_index+1) % len(vms)
-        machine_use = 1;
-    elif round_robin == True and machine_use == 1:
-        vm_cur_index = (vm_cur_index-1) % len(vms)
-        machine_use = 0;
-    elif round_robin == False and total_time > 1:
-        vm_cur_index = (vm_cur_index-1) % len(vms)
 
     return vms[vm_cur_index]
 
