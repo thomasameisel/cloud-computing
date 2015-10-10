@@ -30,10 +30,7 @@ class MyHTTPHandler (BaseHTTPServer.BaseHTTPRequestHandler):
         self.end_headers ()
         self.wfile.write(json.dumps(response))
 
-#if __name__ == '__main__':
-def create_instance (name,port):
-    global PORT
-    PORT = port
+if __name__ == '__main__':
     #print "Instantiating a Prime BaseHTTPServer"
     server_class = BaseHTTPServer.HTTPServer
     httpd = server_class ((HOST, PORT), MyHTTPHandler)
