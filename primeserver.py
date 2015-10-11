@@ -10,7 +10,7 @@ import urlparse
 import json
 
 HOST = ''
-PORT = 8000
+PORT = 8080
 total_time = 0
 num_requests = 0
 vm_array = []
