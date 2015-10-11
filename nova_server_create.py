@@ -80,17 +80,6 @@ def create_vm ():
         # server object we have)
         server = nova.servers.find (name=server_name)
     
-    try:
-        #Assign a floating IP address to the VM:
-        fip = nova.floating_ips.create('ext-net')
-        server.add_floating_ip (address=fip)
-        #Get the fixed IP address for the VM:
-        fixed = (server.addresses)['internal network'][0]['addr']
-    except:
-        print "Exception thrown: ", sys.exc_info()[0]
-        server.delete ()
-        raise
-    
     return server
 
 #Function that terminates a machine
