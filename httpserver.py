@@ -36,7 +36,7 @@ class MyHTTPHandler (BaseHTTPServer.BaseHTTPRequestHandler):
         #later this will be the server to use, now it is just the next port to use for the local server
         next_vm = choose_vm(vm_array)
         params = {'num':prime_num,'response_num':num_requests+1}
-        r = requests.get("http://%s:8000"%next_vm['addresses']['internal network'][0]['addr'],params)
+        r = requests.get("http://%s:8080"%(next_vm.addresses)['internal network'][0]['addr'],params=params)
         data = r.json()
         is_prime = data["is_prime"]
         processing_time = data["processing_time"]
