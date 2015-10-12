@@ -10,7 +10,7 @@ from random import randint
 def main ():
 
     params = {'num':randint(1000000000000000,10000000000000000)}
-    r = requests.get("http://129.59.107.171:8080", params=params)
+    r = requests.get("http://10.10.1.123:8080", params=params)
     print r.json()
 
 # invoke main
