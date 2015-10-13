@@ -4,6 +4,7 @@
 #Created for CS5287: Cloud Computing
 #Institution Vanderbilt University
 
+import time
 import json
 import BaseHTTPServer
 import nova_server_create
@@ -35,8 +36,9 @@ class MyHTTPHandler (BaseHTTPServer.BaseHTTPRequestHandler):
 
         #later this will be the server to use, now it is just the next port to use for the local server
         next_vm = choose_vm(vm_array)
+	ip_address = (next_vm.addresses)['internal network'][0]['addr']
         params = {'num':prime_num,'response_num':num_requests+1}
-        r = requests.get("http://%s:8080"%(next_vm.addresses)['internal network'][0]['addr'],params=params)
+        r = requests.get("http://%s:8080"%ip_address,params=params)
         data = r.json()
         is_prime = data["is_prime"]
         processing_time = data["processing_time"]
@@ -46,12 +48,12 @@ class MyHTTPHandler (BaseHTTPServer.BaseHTTPRequestHandler):
         average_time = total_time/num_requests
         #if average_time is greater than certain amount, spawn new vm
         if average_time > 1 :
-            add_vm(vm_array)
+            thread.start_new_thread(add_vm, (None,vm_array))
         #if average_time is less than certain amount, terminate vm
         if average_time < .0001 and len(vm_array) > 1 :
             remove_vm(vm_array)
 
-        response = {"number":prime_num, "is_prime":is_prime, "processing_time":processing_time,
+        response = {"ip":ip_address, "number":prime_num, "is_prime":is_prime, "processing_time":processing_time,
                     "num_requests":num_requests, "average_processing_time":average_time}
 
         self.send_response (200)
@@ -61,9 +63,10 @@ class MyHTTPHandler (BaseHTTPServer.BaseHTTPRequestHandler):
 
 #later this will create a new server
 #since creating new servers is not working, it creates a new server locally on a new port
-def add_vm (vms):
+def add_vm (thread_name, vms):
     #comment out the next two lines when debugging
-    server = nova_server_create.create_vm()
+    server = nova_server_create.create_vm("vm_%d"%num_requests)
+    time.sleep(30)
     #not sure how to get the fixed ip of the server
     ip_address = (server.addresses)['internal network'][0]['addr']
     getstatusoutput('scp -i key_pair2.pem -o StrictHostKeyChecking=no primeserver.py ubuntu@%s:/home/ubuntu;ssh -i key_pair2.pem -o StrictHostKeyChecking=no ubuntu@%s "nohup python primeserver.py > /dev/null 2>&1 &"'%(ip_address,ip_address))
@@ -98,7 +101,7 @@ if __name__ == '__main__':
     print "Instantiating a BaseHTTPServer"
     server_class = BaseHTTPServer.HTTPServer
     httpd = server_class ((HOST, PORT), MyHTTPHandler)
-    add_vm(vm_array)
+    add_vm(None,vm_array)
     try:
         print "Run a BaseHTTPServer"
         httpd.serve_forever ()

@@ -27,14 +27,13 @@ def get_nova_creds ():
     return d
 
 #Function that creates a virtual machine
-def create_vm ():
+def create_vm (name):
 
     # get our credentials for version 2 of novaclient
     creds = get_nova_creds()
 
     #Assign the server a name
-    random = str(randint(1,20))
-    server_name = 'vm_'+random
+    server_name = name 
 
     # Now access the connection from which everything else is obtained.
     try:
