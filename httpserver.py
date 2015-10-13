@@ -65,7 +65,7 @@ def add_vm (vms):
     #comment out the next two lines when debugging
     server = nova_server_create.create_vm()
     #not sure how to get the fixed ip of the server
-    getstatusoutput("cat primeserver | ssh -i key_pair2.pem ubuntu@%s nohup python &"%(server.addresses)['internal network'][0]['addr'])
+    getstatusoutput("cat primeserver.py | ssh -i key_pair2.pem ubuntu@%s python -"%(server.addresses)['internal network'][0]['addr'])
     vms.append(server)
     #uncomment the next lines when not debugging
     #global vm_cur_port
