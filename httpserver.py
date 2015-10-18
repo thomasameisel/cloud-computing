@@ -36,6 +36,8 @@ class MyHTTPHandler (BaseHTTPServer.BaseHTTPRequestHandler):
 
         #later this will be the server to use, now it is just the next port to use for the local server
         next_vm = choose_vm(vm_array)
+        if round_robin = False:
+        	vm_cur_index = (vm_cur_index-1) % len(vms)
 	ip_address = (next_vm.addresses)['internal network'][0]['addr']
         params = {'num':prime_num,'response_num':num_requests+1}
         r = requests.get("http://%s:8080"%ip_address,params=params)
@@ -92,9 +94,14 @@ def remove_vm (vms):
 def choose_vm (vms):
     global round_robin
     global vm_cur_index
+    global total_time
+    if total_time > 1:
+    	round_robin = False
     if round_robin:
         vm_cur_index = (vm_cur_index+1) % len(vms)
-
+    else:
+    	vm_cur_index = (vm_cur_index+1) % len(vms)
+    	
     return vms[vm_cur_index]
 
 if __name__ == '__main__':
