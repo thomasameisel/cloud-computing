@@ -51,7 +51,7 @@ class MyHTTPHandler (BaseHTTPServer.BaseHTTPRequestHandler):
         if average_time > 1 :
             thread.start_new_thread(add_vm, (None,vm_array))
         #if average_time is less than certain amount, terminate vm
-        if average_time < .0001 and len(vm_array) > 1 :
+        if average_time < .1 and len(vm_array) > 1 :
             remove_vm(vm_array)
 
         response = {"ip":ip_address, "number":prime_num, "is_prime":is_prime, "processing_time":processing_time,
