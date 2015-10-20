@@ -21,6 +21,7 @@ num_requests = 0
 round_robin = True
 vm_array = []
 vm_cur_index = 0
+vm_cur_num_repeated = 0
 
 # MyHTTPHandler inherits from BaseHTTPServer.BaseHTTPRequestHandler
 class MyHTTPHandler (BaseHTTPServer.BaseHTTPRequestHandler):
@@ -34,11 +35,9 @@ class MyHTTPHandler (BaseHTTPServer.BaseHTTPRequestHandler):
         parsed = urlparse.urlparse(self.path)
         prime_num = (urlparse.parse_qs(parsed.query)['num'])[0]
 
-        #later this will be the server to use, now it is just the next port to use for the local server
         next_vm = choose_vm(vm_array)
-        if round_robin = False:
-        	vm_cur_index = (vm_cur_index-1) % len(vms)
-	ip_address = (next_vm.addresses)['internal network'][0]['addr']
+
+        ip_address = (next_vm.addresses)['internal network'][0]['addr']
         params = {'num':prime_num,'response_num':num_requests+1}
         r = requests.get("http://%s:8080"%ip_address,params=params)
         data = r.json()
@@ -63,44 +62,35 @@ class MyHTTPHandler (BaseHTTPServer.BaseHTTPRequestHandler):
         self.end_headers ()
         self.wfile.write (json.dumps(response))
 
-#later this will create a new server
-#since creating new servers is not working, it creates a new server locally on a new port
 def add_vm (thread_name, vms):
-    #comment out the next two lines when debugging
     server = nova_server_create.create_vm("vm_%d"%num_requests)
     time.sleep(30)
-    #not sure how to get the fixed ip of the server
     ip_address = (server.addresses)['internal network'][0]['addr']
     getstatusoutput('scp -i key_pair2.pem -o StrictHostKeyChecking=no primeserver.py ubuntu@%s:/home/ubuntu;ssh -i key_pair2.pem -o StrictHostKeyChecking=no ubuntu@%s "nohup python primeserver.py > /dev/null 2>&1 &"'%(ip_address,ip_address))
     vms.append(server)
-    #uncomment the next lines when not debugging
-    #global vm_cur_port
-    #thread.start_new_thread(primeserver.create_instance, ("",vm_cur_port))
-    #vms.append(vm_cur_port)
-    #vm_cur_port += 1
     print "VM created"
     print "Number of VMs: %s" % len(vms)
 
-#later this will terminate a server
 def remove_vm (vms):
-    #comment out the next line when debugging
     nova_server_create.terminate_vm(vms.index(0))
     vms.pop(0)
     print "VM terminated"
     print "Number of VMs: %s" % len(vms)
 
-#later this will choose the create vm
-#since creating new vms is not working, it returns the port of the next vm
 def choose_vm (vms):
     global round_robin
     global vm_cur_index
-    global total_time
-    if total_time > 1:
-    	round_robin = False
+    global vm_cur_num_repeated
+
+    #round robin should go to the next vm every time
+    #otherwise it should use the first vm once then every other vm 3 times
     if round_robin:
         vm_cur_index = (vm_cur_index+1) % len(vms)
     else:
-    	vm_cur_index = (vm_cur_index+1) % len(vms)
+        if vm_cur_index == 0 or vm_cur_num_repeated >= 3:
+            if vm_cur_index != 0:
+                vm_cur_num_repeated += (vm_cur_num_repeated+1) % 4
+            vm_cur_index = (vm_cur_index+1) % len(vms)
     	
     return vms[vm_cur_index]
 
