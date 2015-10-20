@@ -72,8 +72,8 @@ def add_vm (thread_name, vms):
     print "Number of VMs: %s" % len(vms)
 
 def remove_vm (vms):
-    nova_server_create.terminate_vm(vms.index(0))
-    vms.pop(0)
+    nova_server_create.terminate_vm(vms.index(len(vms)-1))
+    vms.pop(len(vms)-1)
     print "VM terminated"
     print "Number of VMs: %s" % len(vms)
 
