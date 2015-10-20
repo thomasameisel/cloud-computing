@@ -88,9 +88,10 @@ def choose_vm (vms):
         vm_cur_index = (vm_cur_index+1) % len(vms)
     else:
         if vm_cur_index == 0 or vm_cur_num_repeated >= 3:
-            if vm_cur_index != 0:
-                vm_cur_num_repeated += (vm_cur_num_repeated+1) % 4
+            vm_cur_num_repeated = 0
             vm_cur_index = (vm_cur_index+1) % len(vms)
+        else:
+            vm_cur_num_repeated += 1
     	
     return vms[vm_cur_index]
 
