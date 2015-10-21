@@ -16,10 +16,10 @@ def main (num):
 # invoke main
 if __name__ == "__main__":
     for num in range(1, 5):
-	num = 50
+	num = 101
 	data = main(num)
         print "Num: %s Time: %s" % (101, data["processing_time"])
     while True:
-	num = 1010101011010101113
+	num = 101010101101
 	data = main(num)
         print "Num: %s Time: %s" % (num, data["processing_time"])
