@@ -16,7 +16,7 @@ def main (num):
 # invoke main
 if __name__ == "__main__":
     for num in range(1, 5):
-	num = 101
+	num = 50
 	data = main(num)
         print "Num: %s Time: %s" % (101, data["processing_time"])
     while True:
