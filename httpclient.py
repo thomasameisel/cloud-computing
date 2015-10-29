@@ -15,18 +15,18 @@ def main (num):
 
 # invoke main
 if __name__ == "__main__":
-    for num in range(1, 5):
+    for num in range(1, 2):
 	num = 101010101101
 	data = main(num)
-        print "Num: %s Time: %s Average: %s" % (101, data["processing_time"], data["average_processing_time"])
-	time.sleep(45)
+	print data
+	time.sleep(5)
     for num in range(1, 3):
 	num = 1010101011011111
 	data = main(num)
-        print "Num: %s Time: %s Average: %s" % (num, data["processing_time"], data["average_processing_time"])
-	time.sleep(45)
+	print data
+	time.sleep(60)
     for num in range(1, 10):
 	num = 101010101101
 	data = main(num)
-	print "Num: %s Time: %s Average: %s" % (101, data["processing_time"], data["average_processing_time"])
-        time.sleep(45)
+        print data
+	time.sleep(15)
