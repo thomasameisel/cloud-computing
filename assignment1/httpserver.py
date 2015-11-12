@@ -64,7 +64,7 @@ class MyHTTPHandler (BaseHTTPServer.BaseHTTPRequestHandler):
 
 def add_vm (thread_name, vms):
     server = nova_server_create.create_vm("vm_%d"%num_requests)
-    time.sleep(30)
+    time.sleep(20)
     ip_address = (server.addresses)['internal network'][0]['addr']
     getstatusoutput('scp -i key_pair2.pem -o StrictHostKeyChecking=no primeserver.py ubuntu@%s:/home/ubuntu;ssh -i key_pair2.pem -o StrictHostKeyChecking=no ubuntu@%s "nohup python primeserver.py > /dev/null 2>&1 &"'%(ip_address,ip_address))
     vms.append(server)

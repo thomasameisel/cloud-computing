@@ -7,14 +7,26 @@ import thread
 import time
 from random import randint
 
-def main ():
+def main (num):
 
-    params = {'num':randint(1000000000000000,10000000000000000)}
-    r = requests.get("http://10.10.1.123:8080", params=params)
-    print r.json()
+    params = {'num':num}
+    r = requests.get("http://10.10.1.38:8080", params=params)
+    return r.json()
 
 # invoke main
 if __name__ == "__main__":
-    while True: 
-        thread.start_new_thread(main, ())
-        time.sleep(0.1)
+    for num in range(1, 2):
+	num = 101010101101
+	data = main(num)
+	print data
+	time.sleep(5)
+    for num in range(1, 3):
+	num = 1010101011011111
+	data = main(num)
+	print data
+	time.sleep(60)
+    for num in range(1, 10):
+	num = 101010101101
+	data = main(num)
+        print data
+	time.sleep(15)
