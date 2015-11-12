@@ -1,0 +1,16 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+VAGRANTFILE_API_VERSION = "2"
+Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
+  config.vm.hostname = "cloud292-assignment-gr1"
+  config.vm.box = "ubuntu/trusty64"
+  config.vm.network "private_network", ip: "192.168.33.2"
+  config.vm.provision :shell, path: "bootstrap.sh", run: "always"
+  config.vm.provider "virtualbox" do |vb|
+    vb.name = "cloud292-assignment-gr1"
+     vb.gui = true
+     vb.customize ["modifyvm", :id, "--memory", "1024"]
+     vb.customize ["modifyvm", :id, "--cpus", "2"]
+   end
+end
