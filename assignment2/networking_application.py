@@ -132,19 +132,19 @@ def addHosts():
     "9. When you add host using addHost command, DockerHost class will first try to remove it if exits. So first time you will see some warnings/errors in red saying that there is no such container named h1. Ignore them"
 
     info( '\nadding host h1\n' )
-    
+    h1 = net.addHost('h1', ip='10.0.0.1', cls=DockerHost)
 
     info( '\nadding host h2\n' )
-    "write your code here"
+    h2 = net.addHost('h2', ip='10.0.0.2', cls=DockerHost)
 
     info( '\nadding host h3\n' )
-    "write your code here"
+    h3 = net.addHost('h3', ip='10.0.0.3', cls=DockerHost)
 
     info( '\nadding host h4\n' )
-    "write your code here"
+    h4 = net.addHost('h4', ip='10.0.0.4', cls=DockerHost)
 
     info( '\nadding host h5\n' )
-    "write your code here"
+    h5 = net.addHost('h5', ip='10.0.0.5', cls=DockerHost)
 
 
 def addSwitches():
