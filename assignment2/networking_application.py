@@ -132,7 +132,7 @@ def addHosts():
     "9. When you add host using addHost command, DockerHost class will first try to remove it if exits. So first time you will see some warnings/errors in red saying that there is no such container named h1. Ignore them"
 
     info( '\nadding host h1\n' )
-    "write your code here"
+    
 
     info( '\nadding host h2\n' )
     "write your code here"
