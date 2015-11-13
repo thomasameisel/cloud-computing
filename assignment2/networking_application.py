@@ -153,13 +153,13 @@ def addSwitches():
     "1. Add three switches s1, s2 and s3"
     "2. You need to write something like this s1 = net.addSwitch(<parameters>)"
     info( '\nadding switch s1:' )
-    "write your code here"
+    s1 = net.addSwitch('s1')
 
     info( '\nadding switch s2:' )
-    "write your code here"
+    s2 = net.addSwitch('s2')
 
     info( '\nadding switch s3:' )
-    "write your code here"
+    s3 = net.addSwitch('s3')
 
 
 
@@ -176,25 +176,25 @@ def setLinks():
 
 
     info( '\nsetting a link between switch s1 and host h1\n' )
-    "write your code here"
+    net.addLink(s1, h1)
 
     info( '\nsetting a link between switch s1 and host h2\n' )
-    "write your code here"
+    net.addLink(s1, h2)
 
     info( '\nsetting a link between switch s3 and host h3\n' )
-    "write your code here"
+    net.addLink(s3, h3)
 
     info( '\nsetting a link between switch s2 and host h4\n' )
-    "write your code here"
+    net.addLink(s2, h4)
 
     info( '\nsetting a link between switch s2 and host h5\n' )
-    "write your code here"
+    net.addLink(s2, h5)
 
     info( '\nsetting a link between switch s1 and switch s2\n' )
-    "write your code here"
+    net.addLink(s1, s2)
 
     info( '\nsetting a link between switch s3 and switch s2\n' )
-    "write your code here"
+    net.addLink(s3, s2)
 
 
 def networking_application():
