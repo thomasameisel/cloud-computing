@@ -218,19 +218,19 @@ def networking_application():
 
   
     info( '\nrunning server_h1 i.e. server on h1\n' )
-    "write your code here"
+    server_h1 = h1.sendCmd('')
 
     info( '\nrunning server_h2 i.e. server on h2\n' )
-    "write your code here"
+    server_h2 = h2.sendCmd('')
 
     info( '\nrunning server_h3 i.e. server on h3\n' )
-    "write your code here"
+    server_h3 = h3.sendCmd('')
 
     info( '\nrunning client_h4 i.e. client on h4\n' )
-    "write your code here"
+    client_h4 = h4.sendCmd('./client --primary 10.0.0.1 --backup 10.0.0.3')
 
     info( '\nrunning client_h5 i.e. client on h5\n' )
-    "write your code here"
+    client_h5 = h5.sendCmd('')
 
 
     "let it run for 20 seconds"
