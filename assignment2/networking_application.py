@@ -8,7 +8,7 @@ from mininet.net import Mininet
 from mininet.node import Controller, Host, CPULimitedHost
 from mininet.cli import CLI
 from subprocess import call,check_output, Popen, PIPE, STDOUT
-from mininet.log import setLogLevel, info, debug
+from mininet.log import setLogLevel, info, debug, error
 from optparse import OptionParser
 from mininet.topo import Topo
 from mininet.link import TCLink
@@ -18,9 +18,9 @@ from mininet.util import isShellBuiltin, dumpNodeConnections
 "global variables"
 h1=0  #server1
 h2=0  #server2
-h3=0  #server3
-h4=0  #client1
-h5=0  #client2
+h3=0  #client1
+h4=0  #client2
+h5=0  #client3
 s1=0  #switch1
 s2=0  #switch2
 s3=0  #switch3
@@ -38,7 +38,7 @@ def silentremove(filename):
             raise
 silentremove("/vagrant/server_h1.log")
 silentremove("/vagrant/server_h2.log")
-silentremove("/vagrant/server_h3.log")
+silentremove("/vagrant/client_h3.log")
 silentremove("/vagrant/client_h4.log")
 silentremove("/vagrant/client_h5.log")
 silentremove("/vagrant/output.log")
@@ -205,7 +205,7 @@ def networking_application():
     h4 = net.get('h4')  
     h5 = net.get('h5')  
 
-    "1. Run server on hosts h1, h2 and on h3. Run client on hosts h4 and h5"
+    "1. Run server on hosts h1 and h2. Run client on hosts h3, h4, and h5"
     "2  Also make sure to redirect output to a file e.g. ./server &> /home/ubuntu/server_h1.log for h1 and so on for others."
     "3. Since /home/ubuntu of container is shared with /vagrant of VM which in turn shared with current folder where you execute vagrant up, you can view those files in any of the three machines, in host, in guest VM or in container."
     "3. You need to write something like this: server_h2 = h2.sendCmd(<command>)"
@@ -218,28 +218,29 @@ def networking_application():
 
   
     info( '\nrunning server_h1 i.e. server on h1\n' )
-    server_h1 = h1.sendCmd('')
+    server_h1 = h1.sendCmd('./httpserver &> /home/ubuntu/server_h1.log')
 
     info( '\nrunning server_h2 i.e. server on h2\n' )
-    server_h2 = h2.sendCmd('')
+    server_h2 = h2.sendCmd('./httpserver &> /home/ubuntu/server_h2.log')
 
-    info( '\nrunning server_h3 i.e. server on h3\n' )
-    server_h3 = h3.sendCmd('')
+    info( '\nrunning client_h3 i.e. client on h3\n' )
+    client_h3 = h3.sendCmd('./httpclient --primary 10.0.0.1 --backup 10.0.0.2 &> /home/ubuntu/client_h3.log')
 
     info( '\nrunning client_h4 i.e. client on h4\n' )
-    client_h4 = h4.sendCmd('./client --primary 10.0.0.1 --backup 10.0.0.3')
+    client_h4 = h4.sendCmd('./httpclient --primary 10.0.0.1 --backup 10.0.0.2 &> /home/ubuntu/client_h4.log')
 
     info( '\nrunning client_h5 i.e. client on h5\n' )
-    client_h5 = h5.sendCmd('')
+    client_h5 = h5.sendCmd('./httpclient --primary 10.0.0.1 --backup 10.0.0.2 &> /home/ubuntu/client_h5.log')
 
 
     "let it run for 20 seconds"
     info( '\nNormal case: when all links are working\n' )
-    time.sleep(200);
-    info( '\nFault 1: when s1-s2 link is down\n' )
-    "write your code here. bring down link between s1 and s2. use net.configLinkStatus command"
+    time.sleep(200)
+    info( '\nFault 1: when primary server is down\n' )
+    "write your code here. bring down primary server host"
+    h1.terminate()
 
-    time.sleep(200);#fail over could take 30-40 seconds. be patient.
+    time.sleep(200) #fail over could take 30-40 seconds. be patient.
     "Now you should be able to check the log files and see if clients at h4 and h5 fail over to server at h3 since their link to h1 and h2 is severed as a consequence of bringing down s1-s2 link"
     "(optional)also you can check how link parameters that you set before like bandwidth, delay and packet loss affect this communication."
 
@@ -254,13 +255,13 @@ if __name__ == '__main__':
 
     setLogLevel( 'info' )
     info( '\n(1) Adding (Docker/LXC) Hosts..(removing first if exists)\n' )
-    #addHosts();   # Uncomment this line and implement this function. see above
+    addHosts();   # Uncomment this line and implement this function. see above
     info( '\n\n(2) Adding switches..(removing first if exists)\n' )
-    #addSwitches(); # Uncomment this line and implement this function. see above
+    addSwitches(); # Uncomment this line and implement this function. see above
     info( '\n\n(3) Setting Links amongst Hosts and Switches\n')
-    #setLinks(); # Uncomment this line and implement this function. see above
+    setLinks(); # Uncomment this line and implement this function. see above
     info( '\n\n(4) Starting mininet virtual network\n')
-    #net.start() # Uncomment this line
+    net.start() # Uncomment this line
     info( '\n\n(5) Deploying networking_application on this mininet network topology\n' )
-    #networking_application(); # Uncomment this line and implement this function. see above
+    networking_application(); # Uncomment this line and implement this function. see above
   
