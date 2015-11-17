@@ -6,7 +6,7 @@ Deployment script for Networked Application from ACE-REPO/examples/Cloud-292-Ass
 import re, sys, time, select, os, subprocess, threading, errno
 from mininet.net import Mininet
 from mininet.node import Controller, Host, CPULimitedHost
-from mininet.node import OVSController #added this here
+from mininet.node import OVSController #added this here to fix controller issue
 from mininet.cli import CLI
 from subprocess import call,check_output, Popen, PIPE, STDOUT
 from mininet.log import setLogLevel, info, debug, error
@@ -30,7 +30,7 @@ s3=0  #switch3
 "logging"
 
 #net = Mininet( controller=Controller, link=TCLink )
-net = Mininet(topo = topo, controller = OVSController)#added this here as well
+net = Mininet(link=TCLink, controller = OVSController)#added this here as well to fix controller issue
 net.addController( 'c0' )
 def silentremove(filename):
     try:
