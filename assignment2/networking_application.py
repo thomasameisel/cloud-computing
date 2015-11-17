@@ -220,19 +220,19 @@ def networking_application():
 
   
     info( '\nrunning server_h1 i.e. server on h1\n' )
-    server_h1 = h1.sendCmd('python ./httpserver.py &> server_h1.log')
+    server_h1 = h1.sendCmd('git clone https://github.com/thomasameisel/cloud-computing/;cd ./cloud-computing/assignment2;python ./httpserver.py &> server_h1.log')
 
     info( '\nrunning server_h2 i.e. server on h2\n' )
-    server_h2 = h2.sendCmd('python ./httpserver.py &> server_h2.log')
+    server_h2 = h2.sendCmd('git clone https://github.com/thomasameisel/cloud-computing/;cd ./cloud-computing/assignment2;python ./httpserver.py &> server_h2.log')
 
     info( '\nrunning client_h3 i.e. client on h3\n' )
-    client_h3 = h3.sendCmd('python ./httpclient.py --primary 10.0.0.1 --backup 10.0.0.2 &> client_h3.log')
+    client_h3 = h3.sendCmd('git clone https://github.com/thomasameisel/cloud-computing/;cd ./cloud-computing/assignment2;python ./httpclient.py --primary 10.0.0.1 --backup 10.0.0.2 &> client_h3.log')
 
     info( '\nrunning client_h4 i.e. client on h4\n' )
-    client_h4 = h4.sendCmd('python ./httpclient.py --primary 10.0.0.1 --backup 10.0.0.2 &> client_h4.log')
+    client_h4 = h4.sendCmd('git clone https://github.com/thomasameisel/cloud-computing/;cd ./cloud-computing/assignment2;python ./httpclient.py --primary 10.0.0.1 --backup 10.0.0.2 &> client_h4.log')
 
     info( '\nrunning client_h5 i.e. client on h5\n' )
-    client_h5 = h5.sendCmd('python ./httpclient.py --primary 10.0.0.1 --backup 10.0.0.2 &> client_h5.log')
+    client_h5 = h5.sendCmd('git clone https://github.com/thomasameisel/cloud-computing/;cd ./cloud-computing/assignment2;python ./httpclient.py --primary 10.0.0.1 --backup 10.0.0.2 &> client_h5.log')
 
 
     "let it run for 20 seconds"
