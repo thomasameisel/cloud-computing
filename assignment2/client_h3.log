@@ -1,0 +1,26 @@
+Using primary server
+sending a GET request to 10.0.0.1 server
+Switching to backup
+Using backup server
+sending a GET request to 10.0.0.2 server
+Exception thrown:  <class 'socket.timeout'>
+Traceback (most recent call last):
+  File "httpclient.py", line 70, in <module>
+    main(sys.argv[1:])
+  File "httpclient.py", line 50, in main
+    conn2.request("GET", "/")
+  File "/usr/lib/python2.7/httplib.py", line 1048, in request
+    self._send_request(method, url, body, headers)
+  File "/usr/lib/python2.7/httplib.py", line 1088, in _send_request
+    self.endheaders(body)
+  File "/usr/lib/python2.7/httplib.py", line 1044, in endheaders
+    self._send_output(message_body)
+  File "/usr/lib/python2.7/httplib.py", line 888, in _send_output
+    self.send(msg)
+  File "/usr/lib/python2.7/httplib.py", line 850, in send
+    self.connect()
+  File "/usr/lib/python2.7/httplib.py", line 831, in connect
+    self.timeout, self.source_address)
+  File "/usr/lib/python2.7/socket.py", line 575, in create_connection
+    raise err
+socket.timeout: timed out

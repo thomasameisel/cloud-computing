@@ -2,7 +2,7 @@
 import time
 import BaseHTTPServer
 
-HOST = ''
+HOST = '10.0.0.1'
 PORT = 8080
 
 # MyHTTPHandler inherits from BaseHTTPServer.BaseHTTPRequestHandler
@@ -19,9 +19,9 @@ class MyHTTPHandler (BaseHTTPServer.BaseHTTPRequestHandler):
         s.wfile.write ("<html><head><title>Hello World</title></head>")
         s.wfile.write ("<body><p>Hello World.</p>")
         s.wfile.write ("</body.<html>")
-	#k = open('server_h1.log', 'w+')
-	#k.write("server is working")
-	#k.close() 
+	k = open('server_h1.log', 'w+')
+	k.write("server is working")
+	k.close() 
 
 
 if __name__ == '__main__':

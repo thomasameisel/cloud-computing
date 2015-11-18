@@ -35,8 +35,8 @@ def main (argv):
         server = backup
 
     try:
-        conn = httplib.HTTPConnection ('10.0.0.2:8080', timeout=1)
-	conn2 = httplib.HTTPConnection('10.0.0.2:8080', timeout=1)
+        conn = httplib.HTTPConnection ('10.0.0.2:8080', timeout=10)
+	conn2 = httplib.HTTPConnection('10.0.0.2:8080', timeout=10)
 
     except:
         print "Exception thrown: ", sys.exc_info()[0]
@@ -45,9 +45,9 @@ def main (argv):
     print "sending a GET request to %s server" % server
     try:
         if use_primary:
-		conn.request ("GET", "/")
+		conn.request ("POST", "/")
 	else:
-		conn2.request("GET", "/")
+		conn2.request("POST", "/")
     except:
         if use_primary:
             print "Switching to backup"
