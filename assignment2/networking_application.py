@@ -232,7 +232,7 @@ def networking_application():
     client_h4 = h4.sendCmd("/bin/bash -c 'cd /home/cloud-computing/assignment2;python ./httpclient.py --primary 10.0.0.1 --backup 10.0.0.2 &> client_h4.log & /bin/bash'")
 
     info( '\nrunning client_h5 i.e. client on h5\n' )
-    client_h5 = h5.sendCmd("/bin/bash -c 'cd /home/cloud-computing/assignment2;python ./httpclient.py --primary 10.0.0.1 --backup 10.0.0.2 &> client_h5.log & /bin/bash'")
+    client_h5 = h5.sendCmd("/bin/bash -c 'cd /home/laurenb/cloud_computing/cloud-computing/assignment2; sudo python httpclient.py --primary 10.0.0.1 --backup 10.0.0.2 &> client_h5.log & /bin/bash'")
 
 
     "let it run for 20 seconds"
