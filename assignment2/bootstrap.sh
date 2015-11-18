@@ -19,7 +19,7 @@ else
    sudo apt-get -y upgrade
    sudo apt-get -y install git build-essential make
    printf "cloning mininet\n"
-   sudo git clone git://github.com/mininet/mininet mininet; 
+   sudo git clone git://github.com/mininet/mininet mininet;
    printf "installing mininet\n"
    ./mininet/util/install.sh
    printf "installing docker\n"
@@ -47,6 +47,8 @@ else
     printf "myace image already created. Moving on ....\n"
 fi
 
+cd /home
+sudo git clone git://github.com/thomasameisel/cloud-computing
 
 # create the mininet topology and deploy our networking application on it
 cd /vagrant
