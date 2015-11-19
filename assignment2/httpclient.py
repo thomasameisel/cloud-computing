@@ -28,26 +28,21 @@ def main (argv):
             backup = arg
 
     if use_primary:
-        print "Using primary server"
         server = primary
+        print "Using primary server"
     else:
-        print "Using backup server"
         server = backup
+        print "Using backup server"
 
     try:
-        conn = httplib.HTTPConnection ('10.0.0.2:8080', timeout=1)
-	conn2 = httplib.HTTPConnection('10.0.0.2:8080', timeout=1)
-
+        conn = httplib.HTTPConnection (server+':8080', timeout=1)
     except:
         print "Exception thrown: ", sys.exc_info()[0]
         raise
 
-    print "sending a GET request to %s server" % server
+    print "sending a GET request to %s" % server
     try:
-        if use_primary:
-		conn.request ("GET", "/")
-	else:
-		conn2.request("GET", "/")
+	conn.request ("GET", "/")
     except:
         if use_primary:
             print "Switching to backup"
@@ -57,7 +52,7 @@ def main (argv):
             print "Exception thrown: ", sys.exc_info()[0]
             raise
 
-    print "retrieving a response from %s server" % server
+    print "retrieving a response from server"
     try:
         resp = conn.getresponse ()
     except:

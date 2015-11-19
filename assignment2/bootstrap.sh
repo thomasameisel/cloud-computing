@@ -47,9 +47,6 @@ else
     printf "myace image already created. Moving on ....\n"
 fi
 
-cd /home
-sudo git clone git://github.com/thomasameisel/cloud-computing
-
 # create the mininet topology and deploy our networking application on it
 cd /vagrant
 sudo python ./networking_application.py
