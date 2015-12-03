@@ -19,9 +19,9 @@ router.route('/messages')
                 response = {'error': true,'message': 'Error fetching data'};
             } else {
                 response = {'error': false,'message': data};
-            }
+            }cd.cdc
             res.json(response);
-        })
+        });
     })
     .post(function(req,res) {
         var db = new mongoOp();
