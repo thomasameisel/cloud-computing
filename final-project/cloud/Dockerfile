@@ -14,10 +14,10 @@ RUN apt-get -y update
 RUN apt-get -y upgrade
 
 # Install required software packages
-RUN apt-get install -y build-essential make git gcc g++ nodejs nodejs-legacy npm
+RUN apt-get install -y build-essential make git gcc g++ nodejs nodejs-legacy npm mongodb
 
 # Download Github repository from git clone https://github.com/thomasameisel/cloud-computing.git
-RUN cd /home; git clone https://github.com/thomasameisel/cloud-computing.git; cd /home/cloud-computing/final-project/cloud; npm install
+RUN cd /home; git clone https://github.com/thomasameisel/cloud-computing.git; cd /home/cloud-computing/final-project/cloud; npm install; sudo mkdir /data; sudo mkdir /data/db; sudo rm /var/lib/mongodb/mongod.lock
 
 # (optional) provide default entrypoint for container
 #ENTRYPOINT /bin/bash
