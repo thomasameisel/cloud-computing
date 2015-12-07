@@ -8,15 +8,20 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({'extended' : false}));
 
 router.get('/',function(req,res){
-    res.json({"error" : false,"message" : 'Hello World'});
+    console.log('GET /');
+
+    res.json({'error': false,'message': 'GET and POST /messages'});
 });
 
 router.route('/messages')
     .get(function(req,res){
+        console.log('GET /messages');
+
         var response = {};
-        mongoOp.find({},function(err,data){
+        mongoOp.find({location:{$near:{$geometry:{type:"Point",coordinates:[req.body.latitude,req.body.longitude]},}}}).limit(50).exec(function(err,data){
             if (err) {
-                response = {'error': true,'message': 'Error fetching data'};
+		console.log(err);
+                response = {'error': true,'message': 'Error fetching data. Please specify latitude and longitude.'};
             } else {
                 response = {'error': false,'message': data};
             }
@@ -24,16 +29,19 @@ router.route('/messages')
         });
     })
     .post(function(req,res) {
+        console.log('POST /messages');
+
         var db = new mongoOp();
         var response = {};
 
         db.message = req.body.message;
-        db.location = req.body.location;
+        db.location = [req.body.latitude,req.body.longitude];
         db.id = req.body.id;
 
         db.save(function(err) {
             if(err) {
-                response = {'error': true,'message': 'Error adding data'};
+		console.log(err);
+                response = {'error': true,'message': 'Error adding data. Please specify id, message, latitude, and longitude.'};
             } else {
                 response = {'error': false,'message': 'Data added'};
             }
