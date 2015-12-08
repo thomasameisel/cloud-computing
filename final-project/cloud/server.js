@@ -1,4 +1,5 @@
 var express = require("express");
+
 var app = express();
 var bodyParser = require("body-parser");
 var router = express.Router();
@@ -18,9 +19,9 @@ router.route('/messages')
         console.log('GET /messages');
 
         var response = {};
-        mongoOp.find({location:{$near:{$geometry:{type:"Point",coordinates:[req.body.latitude,req.body.longitude]},}}}).limit(50).exec(function(err,data){
+        mongoOp.find({location:{$near:{$geometry:{type:"Point",coordinates:[req.body.longitude,req.body.latitude]},}}}).limit(50).exec(function(err,data){
             if (err) {
-		console.log(err);
+                console.log(err);
                 response = {'error': true,'message': 'Error fetching data. Please specify latitude and longitude.'};
             } else {
                 response = {'error': false,'message': data};
@@ -35,12 +36,12 @@ router.route('/messages')
         var response = {};
 
         db.message = req.body.message;
-        db.location = [req.body.latitude,req.body.longitude];
+        db.location = [req.body.longitude,req.body.latitude];
         db.id = req.body.id;
 
         db.save(function(err) {
             if(err) {
-		console.log(err);
+                console.log(err);
                 response = {'error': true,'message': 'Error adding data. Please specify id, message, latitude, and longitude.'};
             } else {
                 response = {'error': false,'message': 'Data added'};
