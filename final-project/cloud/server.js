@@ -19,7 +19,7 @@ router.route('/messages')
         console.log('GET /messages');
 
         var response = {};
-        mongoOp.find({location:{$near:{$geometry:{type:"Point",coordinates:[req.body.longitude,req.body.latitude]},}}}).limit(50).exec(function(err,data){
+        mongoOp.find({location:{$near:{$geometry:{type:"Point",coordinates:[req.query.longitude,req.query.latitude]},}}}).limit(50).exec(function(err,data){
             if (err) {
                 console.log(err);
                 response = {'error': true,'message': 'Error fetching data. Please specify latitude and longitude.'};
