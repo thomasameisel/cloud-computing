@@ -3,6 +3,9 @@
 # Based on Ubuntu:14.04
 ############################################################
 
+# Create directory and dockerfile
+RUN mkdir sinatra; cd sinatra; touch Dockerfile
+
 # Set the base image to Ubuntu 14.04
 FROM ubuntu:14.04
 
@@ -10,8 +13,8 @@ FROM ubuntu:14.04
 MAINTAINER tommy
 
 # Update repository sources list and/or Upgrade OS kernel
-RUN apt-get -y update
-RUN apt-get -y upgrade
+RUN apt-get -y update && apt-get -y upgrade && apt-get install -y ruby ruby-dev
+RUN gem install sinatra
 
 # Install required software packages
 RUN apt-get install -y build-essential make git gcc g++ nodejs nodejs-legacy npm mongodb
