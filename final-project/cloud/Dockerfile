@@ -3,6 +3,9 @@
 # Based on Ubuntu:14.04
 ############################################################
 
+# Create directory and dockerfile
+RUN mkdir sinatra; cd sinatra; touch Dockerfile
+
 # Set the base image to Ubuntu 14.04
 FROM ubuntu:14.04
 
