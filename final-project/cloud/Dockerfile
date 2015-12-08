@@ -13,8 +13,8 @@ FROM ubuntu:14.04
 MAINTAINER tommy
 
 # Update repository sources list and/or Upgrade OS kernel
-RUN apt-get -y update
-RUN apt-get -y upgrade
+RUN apt-get update && apt-get upgrade && apt-get install -y ruby ruby-dev
+RUN gem install sinatra
 
 # Install required software packages
 RUN apt-get install -y build-essential make git gcc g++ nodejs nodejs-legacy npm mongodb
