@@ -13,7 +13,7 @@ FROM ubuntu:14.04
 MAINTAINER tommy
 
 # Update repository sources list and/or Upgrade OS kernel
-RUN apt-get update && apt-get upgrade && apt-get install -y ruby ruby-dev
+RUN apt-get -y update && apt-get -y upgrade && apt-get install -y ruby ruby-dev
 RUN gem install sinatra
 
 # Install required software packages
