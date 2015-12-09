@@ -11,7 +11,7 @@ app.use(bodyParser.urlencoded({'extended' : false}));
 router.get('/',function(req,res){
     console.log('GET /');
 
-    res.json({'error': false,'message': 'GET and POST /messages'});
+    res.json({'error': false,'type': 'GET','message': 'GET and POST /messages'});
 });
 
 router.route('/messages')
@@ -19,12 +19,12 @@ router.route('/messages')
         console.log('GET /messages');
 
         var response = {};
-        mongoOp.find({location:{$near:{$geometry:{type:"Point",coordinates:[req.query.longitude,req.query.latitude]},}}}).limit(50).exec(function(err,data){
+        mongoOp.find({location:{$near:[req.query.longitude,req.query.latitude]}}).limit(50).exec(function(err,data){
             if (err) {
                 console.log(err);
-                response = {'error': true,'message': 'Error fetching data. Please specify latitude and longitude.'};
+                response = {'error': true,'type': 'GET','message': 'Error fetching data. Please specify latitude and longitude.'};
             } else {
-                response = {'error': false,'message': data};
+                response = {'error': false,'type': 'GET','message': data};
             }
             res.json(response);
         });
@@ -42,9 +42,9 @@ router.route('/messages')
         db.save(function(err) {
             if(err) {
                 console.log(err);
-                response = {'error': true,'message': 'Error adding data. Please specify id, message, latitude, and longitude.'};
+                response = {'error': true,'type': 'POST','message': 'Error adding data. Please specify id, message, latitude, and longitude.'};
             } else {
-                response = {'error': false,'message': 'Data added'};
+                response = {'error': false,'type': 'POST','message': 'Data added'};
             }
             res.json(response);
         });
