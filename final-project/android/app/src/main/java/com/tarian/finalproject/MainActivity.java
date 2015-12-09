@@ -1,15 +1,20 @@
 package com.tarian.finalproject;
 
+import android.Manifest;
+import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
+import android.support.v7.widget.Toolbar;
 import android.view.View;
+import android.widget.Button;
 import android.widget.Toast;
 
 import com.squareup.okhttp.HttpUrl;
@@ -24,6 +29,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.UUID;
 
 public class MainActivity extends AppCompatActivity implements AddItemDialog.OnSaveItemDialog {
@@ -61,16 +67,32 @@ public class MainActivity extends AppCompatActivity implements AddItemDialog.OnS
         listView.setAdapter(mItemAdapter);
 
         client = new OkHttpClient();
-        new HttpAsyncTask().execute(apiHost);
+        enablePermissions();
     }
 
     //returns [latitude,longitude]
     double[] getLocation() {
-        LocationManager lm = (LocationManager)getSystemService(LOCATION_SERVICE);
-        Location location = lm.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+        Location location = getLastKnownLocation();
         double latitude = location.getLatitude();
         double longitude = location.getLongitude();
         return new double[]{latitude,longitude};
+    }
+
+    private Location getLastKnownLocation() {
+        LocationManager mLocationManager = (LocationManager)getApplicationContext().getSystemService(LOCATION_SERVICE);
+        List<String> providers = mLocationManager.getProviders(true);
+        Location bestLocation = null;
+        for (String provider : providers) {
+            Location l = mLocationManager.getLastKnownLocation(provider);
+            if (l == null) {
+                continue;
+            }
+            if (bestLocation == null || l.getAccuracy() < bestLocation.getAccuracy()) {
+                // Found best last known location: %s", l);
+                bestLocation = l;
+            }
+        }
+        return bestLocation;
     }
 
     // code request code here
@@ -88,6 +110,49 @@ public class MainActivity extends AppCompatActivity implements AddItemDialog.OnS
                 .build();
         Response response = client.newCall(request).execute();
         return response.body().string();
+    }
+
+    private void enablePermissions() {
+        if (ContextCompat.checkSelfPermission(this,
+                Manifest.permission.INTERNET)
+                != PackageManager.PERMISSION_GRANTED &&
+                ContextCompat.checkSelfPermission(this,
+                        Manifest.permission.ACCESS_FINE_LOCATION)
+                        != PackageManager.PERMISSION_GRANTED) {
+
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.INTERNET,Manifest.permission.ACCESS_FINE_LOCATION},
+                    0);
+        } else if (ContextCompat.checkSelfPermission(this,
+                Manifest.permission.INTERNET)
+                != PackageManager.PERMISSION_GRANTED) {
+
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.INTERNET},
+                    0);
+        } else if (ContextCompat.checkSelfPermission(this,
+                Manifest.permission.ACCESS_FINE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED) {
+
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                    0);
+        } else {
+            new HttpAsyncTask().execute(apiHost);
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode,
+                                           String permissions[], int[] grantResults) {
+        if ((grantResults.length > 1
+                && grantResults[0] == PackageManager.PERMISSION_GRANTED
+                && grantResults[1] == PackageManager.PERMISSION_GRANTED) ||
+                (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
+
+            new HttpAsyncTask().execute(apiHost);
+        }
     }
 
     public static final MediaType JSON = MediaType.parse("application/json; charset=utf-8");
