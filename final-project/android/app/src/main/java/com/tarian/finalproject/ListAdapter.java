@@ -62,6 +62,12 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ViewHolder> {
         return mList.size();
     }
 
+    public void clearData() {
+        int size = mList.size();
+        mList.clear();
+        notifyItemRangeRemoved(0, size);
+    }
+
     public void addAll(final Collection<Item> itemList) {
         for (Item item : itemList) {
             onItemAdd(item);

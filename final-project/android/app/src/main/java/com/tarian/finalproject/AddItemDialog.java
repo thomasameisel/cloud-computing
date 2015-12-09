@@ -13,11 +13,13 @@ import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 
+import java.util.UUID;
+
 public class AddItemDialog extends DialogFragment {
 
     public interface OnSaveItemDialog {
 
-        void onSaveItemDialog(String id, String message, String location);
+        void onSaveItemDialog(String id, String message);
     }
 
     public static Bundle getCallingArguments(String dialogTitle) {
@@ -54,8 +56,8 @@ public class AddItemDialog extends DialogFragment {
                 .setPositiveButton("Save", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
-                        mSaveListener.onSaveItemDialog("", mMessage.getText().toString(),
-                                "3 miles away");
+                        mSaveListener.onSaveItemDialog(UUID.randomUUID().toString(),
+                                mMessage.getText().toString());
                     }
                 })
                 .setNegativeButton("Cancel", null)

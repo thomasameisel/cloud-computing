@@ -1,23 +1,54 @@
 package com.tarian.finalproject;
 
-import android.support.v7.app.ActionBarActivity;
+import android.location.Location;
+import android.location.LocationManager;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.view.Menu;
-import android.view.MenuItem;
+import android.util.Log;
 import android.view.View;
+import android.widget.Toast;
 
+import com.squareup.okhttp.HttpUrl;
+import com.squareup.okhttp.MediaType;
+import com.squareup.okhttp.OkHttpClient;
+import com.squareup.okhttp.Request;
+import com.squareup.okhttp.RequestBody;
+import com.squareup.okhttp.Response;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.IOException;
+import java.util.UUID;
 
 public class MainActivity extends AppCompatActivity implements AddItemDialog.OnSaveItemDialog {
 
+    final String apiHost = "54.152.164.252";
+    final String apiPostUrl = "http://54.152.164.252/messages";
+
+    OkHttpClient client;
     ListAdapter mItemAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        final SwipeRefreshLayout swipeRefreshLayout = (SwipeRefreshLayout)
+                findViewById(R.id.swipe_refresh_layout);
+
+        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                new HttpAsyncTask().execute(apiHost);
+                swipeRefreshLayout.setRefreshing(false);
+            }
+        });
 
         RecyclerView listView = (RecyclerView)findViewById(R.id.recycler_view);
         listView.setScrollContainer(false);
@@ -29,24 +60,129 @@ public class MainActivity extends AppCompatActivity implements AddItemDialog.OnS
         mItemAdapter.setOnItemClickListener(this);
         listView.setAdapter(mItemAdapter);
 
-        mItemAdapter.onItemAdd(new Item("This is a message", "3 miles away"));
-        mItemAdapter.onItemAdd(new Item("This is a message", "10 miles away"));
-        mItemAdapter.onItemAdd(new Item("This is a message\n\n\nLonglonglonglonglonglong", "34 miles away"));
-        mItemAdapter.onItemAdd(new Item("This is a message", "57 miles away"));
+        client = new OkHttpClient();
+        new HttpAsyncTask().execute(apiHost);
+    }
+
+    //returns [latitude,longitude]
+    double[] getLocation() {
+        LocationManager lm = (LocationManager)getSystemService(LOCATION_SERVICE);
+        Location location = lm.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+        double latitude = location.getLatitude();
+        double longitude = location.getLongitude();
+        return new double[]{latitude,longitude};
+    }
+
+    // code request code here
+    String doGetRequest(String host) throws IOException {
+        double[] location = getLocation();
+        HttpUrl url = new HttpUrl.Builder()
+                .scheme("http")
+                .host(host)
+                .addPathSegment("messages")
+                .addQueryParameter("latitude", Double.toString(location[0]))
+                .addQueryParameter("longitude", Double.toString(location[1]))
+                .build();
+        Request request = new Request.Builder()
+                .url(url)
+                .build();
+        Response response = client.newCall(request).execute();
+        return response.body().string();
+    }
+
+    public static final MediaType JSON = MediaType.parse("application/json; charset=utf-8");
+
+    String doPostRequest(String url, String json) throws IOException {
+        RequestBody body = RequestBody.create(JSON, json);
+        Request request = new Request.Builder()
+                .url(url)
+                .post(body)
+                .build();
+        Response response = client.newCall(request).execute();
+        return response.body().string();
     }
 
     public void addMessage(View view) {
         final Bundle dialogBundle = AddItemDialog.getCallingArguments("Add Message");
-
         final AddItemDialog addItemDialog = new AddItemDialog();
         addItemDialog.setArguments(dialogBundle);
         addItemDialog.show(getSupportFragmentManager(), null);
     }
 
     @Override
-    public void onSaveItemDialog(String id, String message, String location) {
-        mItemAdapter.onItemAdd(new Item(message, location), 0);
-        RecyclerView listView = (RecyclerView)findViewById(R.id.recycler_view);
-        listView.smoothScrollToPosition(0);
+    public void onSaveItemDialog(String id, String message) {
+        try {
+            double[] location = getLocation();
+            JSONObject body = createJSONObject(id, message, location[0], location[1]);
+            new HttpAsyncTask().execute(apiPostUrl, body.toString());
+            Item newItem = new Item(UUID.fromString(id), message, "0.0 meters away");
+            mItemAdapter.onItemAdd(newItem,0);
+            RecyclerView listView = (RecyclerView)findViewById(R.id.recycler_view);
+            listView.smoothScrollToPosition(0);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private JSONObject createJSONObject(String id, String message, double latitude,
+                                        double longitude) throws JSONException {
+        JSONObject json = new JSONObject();
+        json.put("id",id);
+        json.put("message",message);
+        json.put("latitude",latitude);
+        json.put("longitude",longitude);
+        return json;
+    }
+
+    private class HttpAsyncTask extends AsyncTask<String, Void, String> {
+        @Override
+        protected String doInBackground(String... params) {
+            try {
+                if(params.length == 1) {
+                    return doGetRequest(params[0]);
+                } else {
+                    return doPostRequest(params[0],params[1]);
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+                return "";
+            }
+        }
+        // onPostExecute displays the results of the AsyncTask.
+        @Override
+        protected void onPostExecute(String result) {
+            try {
+                JSONObject fullResult = new JSONObject(result);
+                switch(fullResult.getString("type")){
+                    case "GET":
+                        mItemAdapter.clearData();
+
+                        JSONArray messages = fullResult.getJSONArray("message");
+                        double[] userLocation = getLocation();
+                        for (int i = 0; i < messages.length(); ++i) {
+                            JSONObject messageObject = (JSONObject)messages.get(i);
+                            String id = messageObject.getString("id");
+                            String message = messageObject.getString("message");
+
+                            //messageLocation is an array [longitude,latitude]
+                            JSONArray messageLocation = messageObject.getJSONArray("location");
+                            float[] results = new float[1];
+                            Location.distanceBetween(messageLocation.getDouble(1),
+                                    messageLocation.getDouble(0), userLocation[0], userLocation[1],
+                                    results);
+                            String distance = Float.toString(results[0])+" meters away";
+
+                            Item addItem = new Item(UUID.fromString(id), message, distance);
+                            mItemAdapter.onItemAdd(addItem);
+                        }
+                        break;
+                    case "POST":
+                        break;
+                    default:
+                }
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
     }
 }
