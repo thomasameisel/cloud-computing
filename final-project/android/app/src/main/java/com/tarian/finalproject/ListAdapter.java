@@ -2,6 +2,8 @@ package com.tarian.finalproject;
 
 import android.app.Activity;
 import android.content.Context;
+import android.location.Location;
+import android.location.LocationManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -24,14 +26,14 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ViewHolder> {
 
     private static final String GMT = "GMT";
 
-    private List<Item> mList;
-    private AdapterView.OnItemClickListener mOnItemClickListener;
-
     private Context mContext;
 
-    public ListAdapter(final Context context) {
-        this.mList = new ArrayList<>();
+    private ArrayList<Item> mList;
+    private AdapterView.OnItemClickListener mOnItemClickListener;
+
+    public ListAdapter(Context context) {
         this.mContext = context;
+        this.mList = new ArrayList<>();
     }
 
     public void setOnItemClickListener(final Activity activity) {
@@ -49,9 +51,11 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ViewHolder> {
 
     @Override
     public void onBindViewHolder(final ViewHolder holder, final int position) {
+        Location currentLocation = getLastKnownLocation();
         final Item memorea = mList.get(position);
         holder.setMessage(memorea.mMessage);
-        holder.setLocation(memorea.mLocation);
+        holder.setLocation(memorea.mLatitude, memorea.mLongitude, currentLocation.getLatitude(),
+                currentLocation.getLongitude());
     }
 
     /**
@@ -66,6 +70,10 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ViewHolder> {
         int size = mList.size();
         mList.clear();
         notifyItemRangeRemoved(0, size);
+    }
+
+    public ArrayList<Item> getList() {
+        return mList;
     }
 
     public void addAll(final Collection<Item> itemList) {
@@ -130,6 +138,23 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ViewHolder> {
         }
     }
 
+    private Location getLastKnownLocation() {
+        LocationManager mLocationManager = (LocationManager)mContext.getSystemService(mContext.LOCATION_SERVICE);
+        List<String> providers = mLocationManager.getProviders(true);
+        Location bestLocation = null;
+        for (String provider : providers) {
+            Location l = mLocationManager.getLastKnownLocation(provider);
+            if (l == null) {
+                continue;
+            }
+            if (bestLocation == null || l.getAccuracy() < bestLocation.getAccuracy()) {
+                // Found best last known location: %s", l);
+                bestLocation = l;
+            }
+        }
+        return bestLocation;
+    }
+
     /**
      * Binds the memorea to its view
      */
@@ -158,8 +183,13 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ViewHolder> {
             this.message.setText(title);
         }
 
-        public void setLocation(String location) {
-            this.location.setText(location);
+        public void setLocation(double messageLatitude, double messageLongitude,
+                                double currentLatitude, double currentLongitude) {
+            float[] results = new float[1];
+            Location.distanceBetween(messageLatitude, messageLongitude, currentLatitude,
+                    currentLongitude, results);
+            String distance = Float.toString(results[0])+" meters away";
+            this.location.setText(distance);
         }
     }
 }

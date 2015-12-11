@@ -1,6 +1,7 @@
 package com.tarian.finalproject;
 
 import android.Manifest;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationManager;
@@ -13,6 +14,10 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
@@ -70,16 +75,33 @@ public class MainActivity extends AppCompatActivity implements AddItemDialog.OnS
         enablePermissions();
     }
 
-    //returns [latitude,longitude]
-    double[] getLocation() {
-        Location location = getLastKnownLocation();
-        double latitude = location.getLatitude();
-        double longitude = location.getLongitude();
-        return new double[]{latitude,longitude};
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu_main, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            // action with ID action_refresh was selected
+            case R.id.button_add_message:
+                addMessage();
+                break;
+            case R.id.button_map_view:
+                Intent mapViewIntent = new Intent(this, MapViewActivity.class);
+                mapViewIntent.putParcelableArrayListExtra("messages", mItemAdapter.getList());
+                startActivity(mapViewIntent);
+                break;
+            default:
+        }
+
+        return true;
     }
 
     private Location getLastKnownLocation() {
-        LocationManager mLocationManager = (LocationManager)getApplicationContext().getSystemService(LOCATION_SERVICE);
+        LocationManager mLocationManager = (LocationManager)getSystemService(LOCATION_SERVICE);
         List<String> providers = mLocationManager.getProviders(true);
         Location bestLocation = null;
         for (String provider : providers) {
@@ -96,14 +118,14 @@ public class MainActivity extends AppCompatActivity implements AddItemDialog.OnS
     }
 
     // code request code here
-    String doGetRequest(String host) throws IOException {
-        double[] location = getLocation();
+    private String doGetRequest(String host) throws IOException {
+        Location currentLocation = getLastKnownLocation();
         HttpUrl url = new HttpUrl.Builder()
                 .scheme("http")
                 .host(host)
                 .addPathSegment("messages")
-                .addQueryParameter("latitude", Double.toString(location[0]))
-                .addQueryParameter("longitude", Double.toString(location[1]))
+                .addQueryParameter("latitude", Double.toString(currentLocation.getLatitude()))
+                .addQueryParameter("longitude", Double.toString(currentLocation.getLongitude()))
                 .build();
         Request request = new Request.Builder()
                 .url(url)
@@ -167,7 +189,7 @@ public class MainActivity extends AppCompatActivity implements AddItemDialog.OnS
         return response.body().string();
     }
 
-    public void addMessage(View view) {
+    public void addMessage() {
         final Bundle dialogBundle = AddItemDialog.getCallingArguments("Add Message");
         final AddItemDialog addItemDialog = new AddItemDialog();
         addItemDialog.setArguments(dialogBundle);
@@ -177,10 +199,12 @@ public class MainActivity extends AppCompatActivity implements AddItemDialog.OnS
     @Override
     public void onSaveItemDialog(String id, String message) {
         try {
-            double[] location = getLocation();
-            JSONObject body = createJSONObject(id, message, location[0], location[1]);
+            Location currentLocation = getLastKnownLocation();
+            JSONObject body = createJSONObject(id, message, currentLocation.getLatitude(),
+                    currentLocation.getLongitude());
             new HttpAsyncTask().execute(apiPostUrl, body.toString());
-            Item newItem = new Item(UUID.fromString(id), message, "0.0 meters away");
+            Item newItem = new Item(UUID.fromString(id), message, currentLocation.getLatitude(),
+                    currentLocation.getLongitude());
             mItemAdapter.onItemAdd(newItem,0);
             RecyclerView listView = (RecyclerView)findViewById(R.id.recycler_view);
             listView.smoothScrollToPosition(0);
@@ -223,7 +247,6 @@ public class MainActivity extends AppCompatActivity implements AddItemDialog.OnS
                         mItemAdapter.clearData();
 
                         JSONArray messages = fullResult.getJSONArray("message");
-                        double[] userLocation = getLocation();
                         for (int i = 0; i < messages.length(); ++i) {
                             JSONObject messageObject = (JSONObject)messages.get(i);
                             String id = messageObject.getString("id");
@@ -231,13 +254,8 @@ public class MainActivity extends AppCompatActivity implements AddItemDialog.OnS
 
                             //messageLocation is an array [longitude,latitude]
                             JSONArray messageLocation = messageObject.getJSONArray("location");
-                            float[] results = new float[1];
-                            Location.distanceBetween(messageLocation.getDouble(1),
-                                    messageLocation.getDouble(0), userLocation[0], userLocation[1],
-                                    results);
-                            String distance = Float.toString(results[0])+" meters away";
-
-                            Item addItem = new Item(UUID.fromString(id), message, distance);
+                            Item addItem = new Item(UUID.fromString(id), message,
+                                    messageLocation.getDouble(1), messageLocation.getDouble(0));
                             mItemAdapter.onItemAdd(addItem);
                         }
                         break;
