@@ -4,7 +4,7 @@
   "description": "Cloud Computing Final Project",
   "main": "server.js",
   "scripts": {
-    "start": "NODE_PATH=lib node server.js"
+    "start": "NODE_PATH=lib nodejs server.js"
   },
   "author": "Tommy Meisel",
   "license": "Apache 2",
