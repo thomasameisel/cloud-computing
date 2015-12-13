@@ -23,7 +23,3 @@ EXPOSE 27017
 
 # Set usr/bin/mongod as the dockerized entry-point application
 ENTRYPOINT ["usr/bin/mongod"]
-
-# Download Github repository from git clone https://github.com/thomasameisel/cloud-computing.git
-#RUN cd /home; git clone https://github.com/thomasameisel/cloud-computing.git; cd /home/cloud-computing/final-project/cloud; npm install; sudo mkdir /data; sudo mkdir /data/db; sudo rm /var/lib/mongodb/mongod.lock
-
