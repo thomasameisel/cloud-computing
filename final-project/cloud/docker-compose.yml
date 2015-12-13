@@ -1,6 +1,6 @@
 
 # start server on port 5000
-# builds from the dockerfile in current directory, forwards exposed port from container to host,
+# builds from the dockerfile in current directory & forwards exposed port from container to host
 # mounts project directory on the host to /code... allows code to be modified without rebuild
 # links web service to Redis service
 
